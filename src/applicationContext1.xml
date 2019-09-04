@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+
+<!--1.配置目标对象
+注解版...
+-->
+
+<bean name="usersImp" class="com.spring.aop.dao.imp.UsersImp"></bean>
+<!--   &lt;!&ndash;2.通知&ndash;&gt;-->
+<bean name="usersAdvice" class="com.spring.aop.UsersAdvice"></bean>
+   <!--  &lt;!&ndash;3.将通知对象织入到目标对象中&ndash;&gt;-->
+   <aop:config>
+ <!--     &lt;!&ndash;配置的切入点expression&ndash;&gt;
+      &lt;!&ndash;
+         public  void  com.spring.aop.obj.UsersImp.save()
+
+          void  com.spring.aop.obj.UsersImp.save()
+
+        * com.spring.aop.obj.UsersImp.save()
+
+        * com.spring.aop.obj.UsersImp.*()
+
+          * com.spring.aop.obj.UsersImp.*(..)
+
+         * com.spring.aop.*.UsersImp.*(..)
+  -->
+
+        <aop:pointcut id="pt" expression="execution(* com.spring.aop.dao.*.UsersImp.*(..))" />
+  <!--     &lt;!&ndash; 配置通知要进行指定那个切点&ndash;&gt;-->
+        <aop:aspect ref="usersAdvice">
+     <!--      &lt;!&ndash;配置
+                 前置通知
+                后置通知
+                异常通知
+                最终通知
+                环绕通知
+           &ndash;&gt;-->
+            <!--前置通知-->
+            <aop:before method="getBefore" pointcut-ref="pt"></aop:before>
+
+            <!--后置通知-->
+         <aop:after-returning method="getAfterException"    pointcut-ref="pt"></aop:after-returning>
+
+            <!--  环绕通知-->
+         <aop:around method="getAroud" pointcut-ref="pt"></aop:around>
+            <!--异常通知-->
+           <aop:after-throwing method="getException"   pointcut-ref="pt"></aop:after-throwing>
+            <!-- 最终通知-->
+         <aop:after method="getAfter"  pointcut-ref="pt"></aop:after>
+
+        </aop:aspect>
+   </aop:config>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   <!--复杂类型的注入-->
+   <bean  name="perosn02" class="com.spring.pojo.Person">
+      <!--单个值的注入-->
+    <!--<property name="obj" value="ww"></property>-->
+
+      <!--多个值的注入-->
+      <property name="obj">
+         <array>
+            <value>123</value>
+            <value>343</value>
+            <value>4545</value>
+            <value>小王</value>
+            <value>小张</value>
+            <ref bean="car1"></ref>
+         </array>
+
+
+      </property>
+      <!--集合的注入 LIST set-->
+      <property name="list">
+         <list>
+            <value>12312</value>
+            <value>隔壁老陈</value>
+            <value>隔壁小姐姐</value>
+            <ref bean="car1"></ref>
+         </list>
+      </property>
+
+      <!--Map集合-->
+      <property name="map">
+         <map>
+            <entry key="KEY01" value-ref="car1"></entry>
+            <entry key="KEY02" value="小王"></entry>
+            <entry key="KEY03" value="小李"></entry>
+         </map>
+
+      </property>
+
+   </bean>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   <!--Set
+    注入
+   -->
+   <bean name="users" class="com.spring.pojo.Users">
+       <property name="name" value="隔壁老陈"></property>
+       <property name="age" >
+          <value>123</value>
+       </property>
+
+   </bean>
+
+<!--值类型注入-->
+
+   <bean name="users01" class="com.spring.pojo.Users">
+      <property name="name" value="隔壁老张"></property>
+      <property name="age" >
+         <value>88</value>
+      </property>
+      <property name="car" ref="car1"></property>
+
+   </bean>
+
+
+   <!--构造函数的注入-->
+
+   <bean name="users02" class="com.spring.pojo.Users">
+       <constructor-arg name="name" value="隔壁老王"></constructor-arg>
+       <constructor-arg name="age" value="121"></constructor-arg>
+   </bean>
+   <bean name="users03" class="com.spring.pojo.Users">
+      <constructor-arg  index="0" value="隔壁老郑"></constructor-arg>
+      <constructor-arg  index="1" value="121"></constructor-arg>
+   </bean>
+
+
+
+
+
+   <bean  name="car1" class="com.spring.pojo.Car">
+      <property name="color" value="红色"></property>
+      <property name="cname" value="法拉利"></property>
+
+   </bean>
+
+
+</beans>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<!--加载数据源的信息(连接数据库的信息)-->
+<context:property-placeholder  location="classpath:db.properties"></context:property-placeholder>
+<!--1.将连接数据库的信息放入到连接池中
+   C3p0连接 ,连接数据库的资源
+-->
+<bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+     <property name="driverClass" value="${jdbc_driver}"></property>
+     <property name="jdbcUrl" value="${jdbc_rul}"></property>
+     <property name="user" value="${jdbc_users}"></property>
+     <property name="password" value="${jdbc_pwd}"></property>
+</bean>
+
+   <!--2.将users  dao层  放入到Spring容器中-->
+    <bean name="studentDao" class="com.spring.autocommit.dao.imp.StudentImp">
+       <!--获取数据库 的资源的-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--3、将 users  Serivce层放入到Spring的容器中-->
+    <bean name="studentSerivce" class="com.spring.autocommit.serivce.imp.StudentSerivcImpl">
+        <!--标识将studentDaobean  对象注入到StudentSerivcImpl 类中的IStudent里面-->
+        <property name="iStudent" ref="studentDao"></property>
+      <!--  <property name="tt" ref="transactionTemplate"></property>-->
+    </bean>
+    <!--配置事务-->
+
+    <bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+       <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+
+
+
+    <!--注解版的-->
+<tx:annotation-driven></tx:annotation-driven>
+
+
+<!--    &lt;!&ndash;方式二配置&ndash;&gt;
+
+    &lt;!&ndash;配置事务的通知&ndash;&gt;
+  <tx:advice  id="txAdvice" transaction-manager="transactionManager">
+           <tx:attributes>
+               <tx:method name="svae*"  isolation="REPEATABLE_READ" propagation="REQUIRED"   read-only="false"/>
+               <tx:method name="update*"  isolation="REPEATABLE_READ" propagation="REQUIRED"   read-only="false"/>
+               <tx:method name="delete*"  isolation="REPEATABLE_READ" propagation="REQUIRED"   read-only="false"/>
+               <tx:method name="add*"  isolation="REPEATABLE_READ" propagation="REQUIRED"   read-only="false"/>
+
+               <tx:method name="select*"  isolation="REPEATABLE_READ" propagation="REQUIRED"   read-only="true"/>
+               <tx:method name="find*"  isolation="REPEATABLE_READ" propagation="REQUIRED"   read-only="true"/>
+
+
+               <tx:method name="testUpdateAndAdd"  isolation="REPEATABLE_READ" propagation="REQUIRED"   read-only="false"/>
+           </tx:attributes>
+  </tx:advice>
+
+    &lt;!&ndash;配置砼浇筑织入到目标对象中&ndash;&gt;
+ <aop:config>
+     <aop:pointcut id="txpointcut" expression="execution(* com.spring.autocommit.serivce.imp.*.*(..))"/>
+     <aop:advisor advice-ref="txAdvice"  pointcut-ref="txpointcut"></aop:advisor>
+</aop:config>-->
+
+
+    <!---->
+    
+
+
+
+
+
+
+    <!--配置事务模版 方式一-->
+<!--    <bean name="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+    <property name="transactionManager" ref="transactionManager"></property>
+    </bean>-->
+
+
+
+
+
+
+</beans>
